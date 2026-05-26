@@ -7,8 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.mrityunjay.dietease.service.UserService;
+
 import com.mrityunjay.dietease.dto.AuthResponse;
+import com.mrityunjay.dietease.dto.CreateUserRequest;
 import com.mrityunjay.dietease.dto.LoginRequest;
+import com.mrityunjay.dietease.dto.UserDTO;
 import com.mrityunjay.dietease.entity.Users;
 import com.mrityunjay.dietease.exception.ResourceNotFoundException;
 import com.mrityunjay.dietease.repository.UsersRepository;
@@ -23,6 +27,9 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -45,5 +52,16 @@ public class AuthController {
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
         return ResponseEntity.ok(new AuthResponse(token, "Login Successful!"));
+    }
+
+    // 1. The Registration Endpoint
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> registerNewUser(@Valid @RequestBody CreateUserRequest request) {
+        
+        // Hand the validated JSON package directly to your service
+        UserDTO createdUser = userService.createUser(request);
+        
+        // Return a 201 CREATED status with the clean DTO
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 }

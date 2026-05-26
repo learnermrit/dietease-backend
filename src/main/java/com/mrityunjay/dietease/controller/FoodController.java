@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.mrityunjay.dietease.dto.FoodDTO;
+import com.mrityunjay.dietease.entity.Foods;
 import com.mrityunjay.dietease.service.FoodService;
 
 import java.util.HashMap;
@@ -49,4 +50,16 @@ public ResponseEntity<Map<String, String>> triggerPoolImport() {
     
     return ResponseEntity.ok(response);
 }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Foods>> searchFoods(@RequestParam String keyword) {
+        List<Foods> results = foodService.searchFoodsByKeyword(keyword);
+        return ResponseEntity.ok(results);
+    }
+    
+    @GetMapping("/vegetarian")
+    public ResponseEntity<List<Foods>> getVegetarianFoods() {
+        List<Foods> vegFoods = foodService.getOnlyVegetarianFoods();
+        return ResponseEntity.ok(vegFoods);
+    }
  }

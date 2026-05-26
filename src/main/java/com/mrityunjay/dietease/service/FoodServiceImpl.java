@@ -134,4 +134,15 @@ public String bulkImportThreadPool() {
 
     return "Saved " + totalRecords + " items using 10 Threads in " + timeTakenSeconds + " seconds.";
 }
+
+    @Override
+    public List<Foods> searchFoodsByKeyword(String keyword) {
+        // You can add extra business logic here later (e.g., logging the search)
+        return foodsRepository.findByFoodnameContainingIgnoreCase(keyword);
+    }
+
+    @Override
+    public List<Foods> getOnlyVegetarianFoods() {
+        return foodsRepository.findByIsVeg(true);
+    }
 } 
