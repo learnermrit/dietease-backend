@@ -37,4 +37,23 @@ public class AiController {
         
         return ResponseEntity.ok(Map.of("answer", aiResponse));
     }
+
+    // 🧠 3. Endpoint to UPLOAD Java Code (DevOps Ingestion)
+    @PostMapping("/ingest/devops")
+    public ResponseEntity<String> teachDevOpsBrain(@RequestBody Map<String, String> payload) {
+        String codeSnippet = payload.get("knowledge");
+        ingestionService.ingestDevOpsKnowledge(codeSnippet);
+        
+        return ResponseEntity.ok("Successfully injected application code into the DevOps vector table!");
+    }
+
+    // 🗣️ 4. Endpoint to DEBUG with the AI (DevOps Chat)
+    @PostMapping("/chat/devops")
+    public ResponseEntity<Map<String, String>> askDevOpsLead(@RequestBody Map<String, String> payload) {
+        String userQuestion = payload.get("question");
+        
+        String aiResponse = chatService.askDevOpsLead(userQuestion);
+        
+        return ResponseEntity.ok(Map.of("answer", aiResponse));
+    }
 }

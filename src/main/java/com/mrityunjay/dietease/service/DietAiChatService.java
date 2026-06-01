@@ -20,6 +20,10 @@ public class DietAiChatService {
     @Qualifier("nutritionVectorStore")
     private VectorStore nutritionStore; // Physically isolated database!
 
+    @Autowired
+    @Qualifier("devOpsVectorStore")
+    private VectorStore devOpsStore;
+
     public DietAiChatService(ChatClient.Builder chatClientBuilder) {
         this.chatClient = chatClientBuilder.build();
     }
@@ -41,6 +45,33 @@ public class DietAiChatService {
             If the information does not contain the answer, politely say you don't have that data.
             
             User Question: {question}
+            """;
+
+        PromptTemplate template = new PromptTemplate(promptString);
+        template.add("knowledge", systemKnowledge);
+        template.add("question", userQuestion);
+
+        return chatClient.prompt(template.create()).call().content();
+    }
+
+    public String askDevOpsLead(String userQuestion) {
+        // 1. Search only the DevOps database
+        List<Document> similarData = devOpsStore.similaritySearch(userQuestion);
+        
+        String systemKnowledge = similarData.stream()
+                .map(Document::getContent)
+                .collect(Collectors.joining("\n"));
+
+        // 2. The Tech Lead Persona Prompt
+        String promptString = """
+            You are a Senior Java/Spring Boot Architect debugging the DietEase platform. 
+            Use the following internal application code and logs to answer the developer's question. 
+            If the code does not contain the answer, say "I cannot find that in the provided architecture."
+            
+            Internal Codebase Context:
+            {knowledge}
+            
+            Developer Question: {question}
             """;
 
         PromptTemplate template = new PromptTemplate(promptString);
