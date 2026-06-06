@@ -51,7 +51,12 @@ public class DietAiChatService {
         template.add("knowledge", systemKnowledge);
         template.add("question", userQuestion);
 
-        return chatClient.prompt(template.create()).call().content();
+        // return chatClient.prompt(template.create()).call().content();
+
+        return chatClient.prompt(template.create())
+                .functions("bmiCalculator") // <--- THE MAGIC WIRING
+                .call()
+                .content();
     }
 
     public String askDevOpsLead(String userQuestion) {
