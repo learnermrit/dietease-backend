@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  postgres-vector-db:
+    # We cannot use the standard postgres image. We MUST use the official pgvector image.
+    image: pgvector/pgvector:pg16
+    container_name: dietease_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: DietEaseProd
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_vector_data:/var/lib/postgresql/data
+    # This command ensures the pgvector extension is automatically created inside the database on boot
+    command: >
+      sh -c "
+        docker-entrypoint.sh postgres & 
+        sleep 5; 
+        psql -U postgres -d DietEaseProd -c 'CREATE EXTENSION IF NOT EXISTS vector;'; 
+        wait
+      "
+
+volumes:
+  # This ensures your AI vectors aren't deleted if the container stops
+  postgres_vector_data:
